@@ -1,100 +1,83 @@
 import flet as ft
+import re
 import matplotlib.pyplot as plt
-import io
-from base64 import b64encode
+from io import BytesIO
 
-# Função para gerar gráfico como uma imagem base64
-def gerar_grafico(acertos, erros):
+# Função para validação de CPF ou outra lógica de cálculo
+def validar_resposta(resposta_usuario, etapa):
+    # Lógica para validar as respostas, com base nas etapas
+    resp_esp5 = ["y=7", "7", "y=2*2+3", "y = 2*2 + 3", "y=4+3", "y = 4 + 3"]
+    if etapa == 1 and resposta_usuario in [resp.lower() for resp in resp_esp5]:
+        return True
+    # Adicione outras verificações de etapas aqui...
+    return False
+
+# Função para exibir gráficos
+def mostrar_grafico(acertos, erros, page):
+    fig, ax = plt.subplots()
     categorias = ['Corretas', 'Erradas']
     valores = [acertos, erros]
-
-    fig, ax = plt.subplots()
     ax.bar(categorias, valores, color=['green', 'red'])
     ax.set_xlabel('Resultado')
     ax.set_ylabel('Número de Perguntas')
     ax.set_title('Resultados do Quiz')
-
-    # Converter o gráfico em base64 para exibir no Flet
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png")
+    
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
     buf.seek(0)
-    img_base64 = b64encode(buf.read()).decode('utf-8')
-    buf.close()
-    return f"data:image/png;base64,{img_base64}"
 
-# Função para verificar as respostas e avançar
-def verificar_resposta(page, etapa, acertos, erros, respostas, resposta_usuario, dica):
-    if resposta_usuario in respostas:
-        acertos += 1
-        page.controls.append(ft.Text("Você acertou!", color="green"))
-    else:
-        erros += 1
-        page.controls.append(ft.Text(f"Sua resposta está errada. Dica: {dica}", color="red"))
-    return acertos, erros
+    image = ft.Image(src_base64=buf.read(), width=400, height=300)
+    page.controls.append(image)
+    page.update()
 
-# Função principal do aplicativo Flet
+# Função principal para criar a interface com Flet
 def main(page: ft.Page):
     page.title = "Tutor de Matemática"
-    page.bgcolor = ft.colors.LIGHT_GREEN
-
+    
     etapa = 1
     acertos = 0
     erros = 0
 
-    def avancar_etapa(e):
+    resultado_texto = ft.Text()
+    pergunta = ft.Text("1) Encontre o valor de y, dado que y = 2x + 3 quando x = 2:")
+    resposta_input = ft.TextField(label="Sua resposta", width=250)
+
+    def verificar_click(e):
         nonlocal etapa, acertos, erros
+        resposta_usuario = resposta_input.value.strip().lower()
+        if validar_resposta(resposta_usuario, etapa):
+            resultado_texto.value = "Você acertou!"
+            resultado_texto.color = ft.colors.GREEN
+            acertos += 1
+            etapa += 1
+        else:
+            resultado_texto.value = "Resposta incorreta. Tente novamente."
+            resultado_texto.color = ft.colors.RED
+            erros += 1
 
-        if etapa == 1:
-            resposta_usuario = resposta_1.value.strip().lower()
-            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["y=7", "7", "y = 7"], resposta_usuario, "Substitua o valor de x na equação.")
-            etapa += 1
-        elif etapa == 2:
-            resposta_usuario = resposta_2.value.strip().lower()
-            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["8=2x+2"], resposta_usuario, "Reescreva a equação com o valor de y.")
-            etapa += 1
+        # Exibir a próxima pergunta
+        if etapa == 2:
+            pergunta.value = "2) Dada a reta y = 2x + 2, encontre o valor de x quando y = 8."
         elif etapa == 3:
-            resposta_usuario = resposta_3.value.strip().lower()
-            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["2x=6"], resposta_usuario, "Subtraia 2 nos dois lados da equação.")
-            etapa += 1
-        elif etapa == 4:
-            resposta_usuario = resposta_4.value.strip().lower()
-            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["x=3"], resposta_usuario, "Divida por 2 nos dois lados da equação.")
-            etapa += 1
-
-        # Atualizar o gráfico ao final
-        if etapa > 4:
-            img_data = gerar_grafico(acertos, erros)
-            page.controls.append(ft.Image(src=img_data))
-
+            pergunta.value = "3) Resolva a equação 2x=6."
+        elif etapa > 3:
+            resultado_texto.value = "Você concluiu todas as etapas!"
+            mostrar_grafico(acertos, erros, page)
+        
         page.update()
 
-    # Layout de perguntas
-    pergunta_1 = ft.Text("1) Qual o valor de y quando x = 2, dada a reta y = 2x + 3?")
-    resposta_1 = ft.TextField(label="Resposta")
-    
-    pergunta_2 = ft.Text("2) Qual o valor de x quando y = 8, dada a reta y = 2x + 2?")
-    resposta_2 = ft.TextField(label="Resposta")
-    
-    pergunta_3 = ft.Text("3) Nossa equação agora é 8 = 2x + 2. Resolva para x.")
-    resposta_3 = ft.TextField(label="Resposta")
-    
-    pergunta_4 = ft.Text("4) Resolva x em 2x = 6?")
-    resposta_4 = ft.TextField(label="Resposta")
+    # Botão para verificar a resposta
+    verificar_button = ft.ElevatedButton(text="Verificar", on_click=verificar_click)
 
-    # Botão para avançar
-    verificar_button = ft.ElevatedButton(text="Verificar", on_click=avancar_etapa)
+    # Adicionar elementos à página
+    page.add(
+        ft.Text("Bem-vindo ao Tutor de Matemática", style="headlineMedium"),
+        pergunta,
+        resposta_input,
+        verificar_button,
+        resultado_texto,
+    )
 
-    # Adicionar controles à página
-    page.controls.append(pergunta_1)
-    page.controls.append(resposta_1)
-    page.controls.append(pergunta_2)
-    page.controls.append(resposta_2)
-    page.controls.append(pergunta_3)
-    page.controls.append(resposta_3)
-    page.controls.append(pergunta_4)
-    page.controls.append(resposta_4)
-    page.controls.append(verificar_button)
-
-    page.update()
-
-ft.app(target=main)
+# Executar a interface Flet
+if __name__ == "__main__":
+    ft.app(target=main)
