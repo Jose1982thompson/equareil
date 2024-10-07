@@ -53,17 +53,13 @@ question_page = ft.Column([
     resultado_label,
 ])
 
-# Configuração inicial da página
-page = ft.Page(
-     content=ft.Column([
-        welcome_page,
-        question_page,
-    ])
-)
+page = ft.Page()
+page.add(welcome_page)
+page.add(question_page)
 
 # Iniciar o app
 welcome_page.visible = True
 question_page.visible = False
 
-page.run()
-
+#page.run()
+flet.app(target=main)
