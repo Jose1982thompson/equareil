@@ -55,8 +55,7 @@ question_page = ft.Column([
 
 # Configuração inicial da página
 page = ft.Page(
-    title="Tutor de Matemática",
-    content=ft.Column([
+     content=ft.Column([
         welcome_page,
         question_page,
     ])
