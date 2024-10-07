@@ -7,7 +7,7 @@ acertos = 0
 
 # Respostas esperadas
 resp_esp1 = ["7", "x=7"]
-resp_esp2 = ["18", "y=18"
+resp_esp2 = ["18", "y=18"]
 resp_esp3 = ["3x+24=-x+4", "3x+24=4-x", "-x+4=3x+24"]
 resp_esp4 = ["4x=-20", "-20=4x", "3x+x=4-24"]
 resp_esp5 = ["x=-5"]
