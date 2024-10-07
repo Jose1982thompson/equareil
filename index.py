@@ -1,83 +1,91 @@
 import flet as ft
-import re
 import matplotlib.pyplot as plt
-from io import BytesIO
+import numpy as np
 
-# Função para validação de CPF ou outra lógica de cálculo
-def validar_resposta(resposta_usuario, etapa):
-    # Lógica para validar as respostas, com base nas etapas
-    resp_esp5 = ["y=7", "7", "y=2*2+3", "y = 2*2 + 3", "y=4+3", "y = 4 + 3"]
-    if etapa == 1 and resposta_usuario in [resp.lower() for resp in resp_esp5]:
-        return True
-    # Adicione outras verificações de etapas aqui...
-    return False
+# Variáveis globais
+etapa = 1
+acertos = 0
+erros = 0
 
-# Função para exibir gráficos
-def mostrar_grafico(acertos, erros, page):
-    fig, ax = plt.subplots()
-    categorias = ['Corretas', 'Erradas']
-    valores = [acertos, erros]
-    ax.bar(categorias, valores, color=['green', 'red'])
-    ax.set_xlabel('Resultado')
-    ax.set_ylabel('Número de Perguntas')
-    ax.set_title('Resultados do Quiz')
-    
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
+# Respostas esperadas (defina as suas respostas corretas)
+resp_esp1 = ["resposta correta 1"]  # Adicione as respostas corretas
+resp_esp2 = ["resposta correta 2"]  # Adicione as respostas corretas
+resp_esp3 = ["resposta correta 3"]  # Adicione as respostas corretas
+resp_esp4 = ["resposta correta 4"]  # Adicione as respostas corretas
+resp_esp5 = ["resposta correta 5"]  # Adicione as respostas corretas
 
-    image = ft.Image(src_base64=buf.read(), width=400, height=300)
-    page.controls.append(image)
-    page.update()
-
-# Função principal para criar a interface com Flet
-def main(page: ft.Page):
-    page.title = "Tutor de Matemática"
-    
-    etapa = 1
-    acertos = 0
-    erros = 0
-
-    resultado_texto = ft.Text()
-    pergunta = ft.Text("1) Encontre o valor de y, dado que y = 2x + 3 quando x = 2:")
-    resposta_input = ft.TextField(label="Sua resposta", width=250)
-
-    def verificar_click(e):
-        nonlocal etapa, acertos, erros
-        resposta_usuario = resposta_input.value.strip().lower()
-        if validar_resposta(resposta_usuario, etapa):
-            resultado_texto.value = "Você acertou!"
-            resultado_texto.color = ft.colors.GREEN
-            acertos += 1
-            etapa += 1
-        else:
-            resultado_texto.value = "Resposta incorreta. Tente novamente."
-            resultado_texto.color = ft.colors.RED
-            erros += 1
-
-        # Exibir a próxima pergunta
-        if etapa == 2:
-            pergunta.value = "2) Dada a reta y = 2x + 2, encontre o valor de x quando y = 8."
-        elif etapa == 3:
-            pergunta.value = "3) Resolva a equação 2x=6."
-        elif etapa > 3:
-            resultado_texto.value = "Você concluiu todas as etapas!"
-            mostrar_grafico(acertos, erros, page)
-        
-        page.update()
-
-    # Botão para verificar a resposta
-    verificar_button = ft.ElevatedButton(text="Verificar", on_click=verificar_click)
-
-    # Adicionar elementos à página
-    page.add(
-        ft.Text("Bem-vindo ao Tutor de Matemática", style="headlineMedium"),
-        pergunta,
-        resposta_input,
-        verificar_button,
-        resultado_texto,
+# Função para mostrar aviso
+def mostrar_aviso(mensagem, dica=""):
+    return ft.AlertDialog(
+        title="Atenção",
+        content=ft.Column(
+            [
+                ft.Text(mensagem, size=20),
+                ft.Text(dica, size=16) if dica else None,
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+        ),
+        actions=[ft.TextButton("OK", on_click=lambda _: av.view.remove(aviso_dialog))],
     )
 
-# Executar a interface Flet
-if __name__ == "__main__":
-    ft.app(target=main)
+# Função para mostrar sucesso
+def mostrar_sucesso(mensagem):
+    return ft.AlertDialog(
+        title="Sucesso",
+        content=ft.Text(mensagem, size=20),
+        actions=[ft.TextButton("OK", on_click=lambda _: av.view.remove(sucesso_dialog))],
+    )
+
+# Função para calcular e verificar as respostas
+def calcular(e):
+    global etapa, erros, acertos
+    resposta_usuario = e.control.value.strip().lower()
+    
+    if etapa == 1:
+        if resposta_usuario in [resp.lower() for resp in resp_esp5]:
+            acertos += 1
+            etapa += 1
+            av.view.add(mostrar_sucesso("Você acertou a primeira etapa!"))
+        else:
+            erros += 1
+            av.view.add(mostrar_aviso("Sua resposta não está correta, tente novamente.",
+                                       "Dica: reescreva a equação substituindo o valor de x e efetue as operações."))
+    # Adicione as outras etapas da mesma forma...
+
+    # Exiba a próxima pergunta
+    mostrar_proxima_pergunta()
+
+# Função para mostrar perguntas subsequentes
+def mostrar_proxima_pergunta():
+    av.view.remove_all()
+    av.view.add(ft.Column([perguntas[etapa - 1]]))  # Adicione perguntas em uma lista
+
+# Função para criar o gráfico
+def mostrar_grafico():
+    global acertos, erros
+    
+    # Criando gráfico
+    plt.bar(['Acertos', 'Erros'], [acertos, erros])
+    plt.ylabel('Número de Respostas')
+    plt.title('Resultados')
+    plt.show()
+
+# Função principal para criar a interface
+def main(page):
+    global av
+    av = page
+
+    # Estruturas para perguntas e respostas
+    global perguntas
+    perguntas = [
+        ft.Column([ft.Text("Pergunta 1"), ft.TextField(on_submit=calcular)]),
+        ft.Column([ft.Text("Pergunta 2"), ft.TextField(on_submit=calcular)]),
+        # Adicione as perguntas restantes...
+    ]
+    
+    # Adiciona a primeira pergunta ao layout
+    av.view.add(perguntas[0])
+
+# Inicia a aplicação
+ft.app(target=main)
+
