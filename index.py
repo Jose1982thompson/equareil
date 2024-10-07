@@ -61,5 +61,5 @@ page.add(question_page)
 welcome_page.visible = True
 question_page.visible = False
 
-#page.run()
-flet.app(target=main)
+page.run()
+
