@@ -5,6 +5,13 @@ etapa = 1
 acertos = 0
 erros = 0
 
+# Definindo as respostas esperadas
+resp_esp1 = ["x=-5", "-5"]
+resp_esp2 = ["y=9", "9"]
+resp_esp3 = ["equação correta", "solução correta"]
+resp_esp4 = ["interseção correta", "solução final"]
+resp_esp5 = ["equação 1", "resposta esperada"]
+
 # Função para criar uma janela de aviso personalizada
 def mostrar_aviso(page, mensagem, dica=""):
     def fechar_aviso(e):
