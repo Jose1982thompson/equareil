@@ -11,93 +11,54 @@ resp_esp4 = ["y=9", "y = 9", "9"]
 resp_esp5 = ["y=7", "7", "y = 7", "y=2*2+3", "y = 2*2 + 3", "y=4+3", "y = 4 + 3"]
 resp_esp6 = ["8=2x+2", "2x=6", "6=2x", "2x = 6", "6 = 2x"]
 
-# Funções para exibir mensagens
-def mostrar_aviso(mensagem, dica=""):
-    return ft.alert(mensagem + (f"\nDica: {dica}" if dica else ""))
+def calcular(resposta_usuario, resposta_correta, mensagem_sucesso, dica):
+    global acertos, erros, etapa
+    if resposta_usuario in resposta_correta:
+        acertos += 1
+        etapa += 1
+        return f"{mensagem_sucesso}\nAcertos: {acertos}, Erros: {erros}"
+    else:
+        erros += 1
+        return f"Sua resposta não está correta. Dica: {dica}\nAcertos: {acertos}, Erros: {erros}"
 
-def mostrar_sucesso(mensagem):
-    return ft.alert(mensagem)
+def on_start_click(e):
+    # Altera a visibilidade das páginas
+    welcome_page.visible = False
+    question_page.visible = True
+    page.update()
 
-def calcular(resposta_usuario, etapa_atual):
-    global etapa, erros, acertos
-    if etapa_atual == 1:
-        if resposta_usuario.lower() in [resp.lower() for resp in resp_esp5]:
-            mostrar_sucesso("Você acertou a primeira etapa!")
-            acertos += 1
-            etapa += 1
-        else:
-            mostrar_aviso("Sua resposta não está correta, tente novamente.", 
-                          "Dica: reescreva a equação substituindo o valor de x e efetue as operações.")
-            erros += 1
-    elif etapa_atual == 2:
-        if resposta_usuario == "8=2x+2":
-            mostrar_sucesso("Você acertou a segunda etapa!")
-            acertos += 1
-            etapa += 1
-        else:
-            mostrar_aviso("Sua resposta não está correta, tente novamente.", 
-                          "Dica: reescreva a equação substituindo o valor de y.")
-            erros += 1
-    # Continue com as demais etapas...
-    
-    if etapa > 8:
-        mostrar_sucesso("Sucesso: Você completou todas as etapas!")
+def verificar_etapa_1(e):
+    resposta_usuario = resposta_5.value.strip().lower()
+    resposta_correta = [resp.lower() for resp in resp_esp5]
+    feedback = calcular(resposta_usuario, resposta_correta, "Você acertou a primeira etapa!", 
+                        "Reescreva a equação substituindo o valor de x e efetue as operações.")
+    resultado_label.value = feedback
+    page.update()
 
-# Função para gerenciar a interface
-def main(page):
-    global etapa
-    page.title = "Tutor de Matemática"
-    page.bgcolor = "lightgreen"
+# Configuração da página de boas-vindas
+welcome_page = ft.Column([
+    ft.Text("Bem-vindo ao Tutor de Matemática!", size=20),
+    ft.Text("Este tutorial irá guiá-lo através de várias etapas para resolver equações."),
+    ft.ElevatedButton("Começar", on_click=on_start_click),
+])
 
-    def mudar_pagina(pagina):
-        if pagina == 1:
-            frame_welcome.visible = True
-            frame_questions.visible = False
-            frame_results.visible = False
-        elif pagina == 2:
-            frame_welcome.visible = False
-            frame_questions.visible = True
-            frame_results.visible = False
-        elif pagina == 3:
-            frame_welcome.visible = False
-            frame_questions.visible = False
-            frame_results.visible = True
+# Configuração da página de perguntas
+resposta_5 = ft.TextField(label="Resposta 1", width=300)
+resultado_label = ft.Text()
 
-    # Página de Boas-vindas
-    frame_welcome = ft.Column(
-        controls=[
-            ft.Text("Bem-vindo ao Tutor de Matemática!", size=20),
-            ft.Text("Este tutorial irá guiá-lo através de várias etapas para resolver equações."),
-            ft.ElevatedButton("Começar", on_click=lambda _: mudar_pagina(2)),
-        ],
-        visible=True
-    )
+question_page = ft.Column([
+    ft.Text("1) Encontre o valor de y fazendo a substituição necessária. "
+            "Dada a reta y = 2x + 3, qual o valor de y quando x = 2"),
+    resposta_5,
+    ft.ElevatedButton("Verificar", on_click=verificar_etapa_1),
+    resultado_label,
+])
 
-    # Página de Perguntas
-    frame_questions = ft.Column(
-        controls=[
-            ft.Text("1) Encontre o valor de y fazendo a substituição necessária. "
-                    "Dada a reta y = 2x + 3, qual o valor de y quando x = 2"),
-            ft.TextField(on_submit=lambda e: calcular(e.control.value, 1)),
-            ft.Text("2) Dada a reta y = 2x + 2, encontre o valor de x quando y = 8."),
-            ft.TextField(on_submit=lambda e: calcular(e.control.value, 2)),
-            # Adicione mais perguntas e campos conforme necessário
-        ],
-        visible=False
-    )
+# Configuração inicial da página
+page = ft.Page()
+page.add(welcome_page, question_page)
+welcome_page.visible = True
+question_page.visible = False
 
-    # Página de Resultados
-    frame_results = ft.Column(
-        controls=[
-            ft.Text("Resultados:"),
-            ft.Text(f"Corretas: {acertos}"),
-            ft.Text(f"Erradas: {erros}"),
-            # Adicione gráficos ou mais informações conforme necessário
-        ],
-        visible=False
-    )
-
-    # Adicionando os frames à página
-    page.add(frame_welcome, frame_questions, frame_results)
-
-ft.app(target=main)
+# Iniciar o app
+page.run()
