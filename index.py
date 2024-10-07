@@ -53,13 +53,10 @@ question_page = ft.Column([
     resultado_label,
 ])
 
-page = ft.Page()
+# Criação da página
+page = ft.Page(title="Tutor de Matemática", horizontal_alignment=ft.MainAxisAlignment.CENTER)
 page.add(welcome_page)
 page.add(question_page)
 
 # Iniciar o app
-welcome_page.visible = True
-question_page.visible = False
-
-page.run()
-
+ft.app(target=page)
