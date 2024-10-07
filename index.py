@@ -1,161 +1,100 @@
-import tkinter as tk
-from tkinter import messagebox
+import flet as ft
+import matplotlib.pyplot as plt
+import io
+from base64 import b64encode
 
-# Função para verificar as respostas
-def calcular():
-    global etapa
-    if etapa == 2:
-        resposta = resposta_6.get()
-        if resposta == "algo esperável para resposta 6":  # Substitua pelo valor correto
-            messagebox.showinfo("Correto", "Resposta correta!")
+# Função para gerar gráfico como uma imagem base64
+def gerar_grafico(acertos, erros):
+    categorias = ['Corretas', 'Erradas']
+    valores = [acertos, erros]
+
+    fig, ax = plt.subplots()
+    ax.bar(categorias, valores, color=['green', 'red'])
+    ax.set_xlabel('Resultado')
+    ax.set_ylabel('Número de Perguntas')
+    ax.set_title('Resultados do Quiz')
+
+    # Converter o gráfico em base64 para exibir no Flet
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+    img_base64 = b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    return f"data:image/png;base64,{img_base64}"
+
+# Função para verificar as respostas e avançar
+def verificar_resposta(page, etapa, acertos, erros, respostas, resposta_usuario, dica):
+    if resposta_usuario in respostas:
+        acertos += 1
+        page.controls.append(ft.Text("Você acertou!", color="green"))
+    else:
+        erros += 1
+        page.controls.append(ft.Text(f"Sua resposta está errada. Dica: {dica}", color="red"))
+    return acertos, erros
+
+# Função principal do aplicativo Flet
+def main(page: ft.Page):
+    page.title = "Tutor de Matemática"
+    page.bgcolor = ft.colors.LIGHT_GREEN
+
+    etapa = 1
+    acertos = 0
+    erros = 0
+
+    def avancar_etapa(e):
+        nonlocal etapa, acertos, erros
+
+        if etapa == 1:
+            resposta_usuario = resposta_1.value.strip().lower()
+            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["y=7", "7", "y = 7"], resposta_usuario, "Substitua o valor de x na equação.")
             etapa += 1
-            mostrar_proxima_pergunta()
-        else:
-            messagebox.showerror("Errado", "Resposta errada, tente novamente.")
-    elif etapa == 3:
-        resposta = resposta_6b.get()
-        if resposta == "algo esperável para resposta 6b":  # Substitua pelo valor correto
-            messagebox.showinfo("Correto", "Resposta correta!")
+        elif etapa == 2:
+            resposta_usuario = resposta_2.value.strip().lower()
+            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["8=2x+2"], resposta_usuario, "Reescreva a equação com o valor de y.")
             etapa += 1
-            mostrar_proxima_pergunta()
-        else:
-            messagebox.showerror("Errado", "Resposta errada, tente novamente.")
-    elif etapa == 4:
-        resposta = resposta_6c.get()
-        if resposta == "algo esperável para resposta 6c":  # Substitua pelo valor correto
-            messagebox.showinfo("Correto", "Resposta correta!")
+        elif etapa == 3:
+            resposta_usuario = resposta_3.value.strip().lower()
+            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["2x=6"], resposta_usuario, "Subtraia 2 nos dois lados da equação.")
             etapa += 1
-            mostrar_proxima_pergunta()
-        else:
-            messagebox.showerror("Errado", "Resposta errada, tente novamente.")
-    elif etapa == 5:
-        resposta = resposta_1.get()
-        if resposta == "algo esperável para resposta 1":  # Substitua pelo valor correto
-            messagebox.showinfo("Correto", "Resposta correta!")
+        elif etapa == 4:
+            resposta_usuario = resposta_4.value.strip().lower()
+            acertos, erros = verificar_resposta(page, etapa, acertos, erros, ["x=3"], resposta_usuario, "Divida por 2 nos dois lados da equação.")
             etapa += 1
-            mostrar_proxima_pergunta()
-        else:
-            messagebox.showerror("Errado", "Resposta errada, tente novamente.")
-    elif etapa == 6:
-        resposta = resposta_2.get()
-        if resposta == "algo esperável para resposta 2":  # Substitua pelo valor correto
-            messagebox.showinfo("Correto", "Resposta correta!")
-            etapa += 1
-            mostrar_proxima_pergunta()
-        else:
-            messagebox.showerror("Errado", "Resposta errada, tente novamente.")
-    elif etapa == 7:
-        resposta = resposta_3.get()
-        if resposta == "algo esperável para resposta 3":  # Substitua pelo valor correto
-            messagebox.showinfo("Correto", "Resposta correta!")
-            etapa += 1
-            mostrar_proxima_pergunta()
-        else:
-            messagebox.showerror("Errado", "Resposta errada, tente novamente.")
-    elif etapa == 8:
-        resposta = resposta_4.get()
-        if resposta == "algo esperável para resposta 4":  # Substitua pelo valor correto
-            messagebox.showinfo("Correto", "Resposta correta!")
-        else:
-            messagebox.showerror("Errado", "Resposta errada, tente novamente.")
 
-# Função para mudar de página
-def mudar_pagina():
-    global etapa
-    etapa = 2
-    frame_1.pack_forget()
-    frame_2.pack()
+        # Atualizar o gráfico ao final
+        if etapa > 4:
+            img_data = gerar_grafico(acertos, erros)
+            page.controls.append(ft.Image(src=img_data))
 
-# Função para exibir a próxima pergunta
-def mostrar_proxima_pergunta():
-    global etapa
-    # Limpa a tela antes de exibir a próxima pergunta
-    for widget in frame_2.winfo_children():
-        widget.pack_forget()
+        page.update()
 
-    if etapa == 2:
-        pergunta_6.pack(pady=20)
-        resposta_6.pack()
-        verificar_button_6.pack(pady=3)
-    elif etapa == 3:
-        pergunta_6b.pack(pady=20)
-        resposta_6b.pack()
-        verificar_button_6b.pack(pady=3)
-    elif etapa == 4:
-        pergunta_6c.pack(pady=20)
-        resposta_6c.pack()
-        verificar_button_6c.pack(pady=3)
-    elif etapa == 5:
-        pergunta_1.pack(pady=20)
-        resposta_1.pack()
-        verificar_button_1.pack(pady=3)
-    elif etapa == 6:
-        pergunta_2.pack(pady=20)
-        resposta_2.pack()
-        verificar_button_2.pack(pady=3)
-    elif etapa == 7:
-        pergunta_3.pack(pady=20)
-        resposta_3.pack()
-        verificar_button_3.pack(pady=3)
-    elif etapa == 8:
-        pergunta_4.pack(pady=20)
-        resposta_4.pack()
-        verificar_button_4.pack(pady=3)
+    # Layout de perguntas
+    pergunta_1 = ft.Text("1) Qual o valor de y quando x = 2, dada a reta y = 2x + 3?")
+    resposta_1 = ft.TextField(label="Resposta")
+    
+    pergunta_2 = ft.Text("2) Qual o valor de x quando y = 8, dada a reta y = 2x + 2?")
+    resposta_2 = ft.TextField(label="Resposta")
+    
+    pergunta_3 = ft.Text("3) Nossa equação agora é 8 = 2x + 2. Resolva para x.")
+    resposta_3 = ft.TextField(label="Resposta")
+    
+    pergunta_4 = ft.Text("4) Resolva x em 2x = 6?")
+    resposta_4 = ft.TextField(label="Resposta")
 
-# Configuração da janela principal
-root = tk.Tk()
-root.title("Quiz de Matemática")
-root.geometry("800x600")
+    # Botão para avançar
+    verificar_button = ft.ElevatedButton(text="Verificar", on_click=avancar_etapa)
 
-# Definindo frames
-frame_1 = tk.Frame(root)
-frame_2 = tk.Frame(root)
+    # Adicionar controles à página
+    page.controls.append(pergunta_1)
+    page.controls.append(resposta_1)
+    page.controls.append(pergunta_2)
+    page.controls.append(resposta_2)
+    page.controls.append(pergunta_3)
+    page.controls.append(resposta_3)
+    page.controls.append(pergunta_4)
+    page.controls.append(resposta_4)
+    page.controls.append(verificar_button)
 
-frame_1.pack()
+    page.update()
 
-# Adicionando elementos à página inicial (frame_1)
-titulo = tk.Label(frame_1, text="Bem-vindo ao Quiz de Matemática!", font=("Arial", 24))
-titulo.pack(pady=50)
-
-instrucoes = tk.Label(frame_1, text="Clique no botão abaixo para começar", font=("Arial", 16))
-instrucoes.pack(pady=20)
-
-comecar_button = tk.Button(frame_1, text="Começar", command=mudar_pagina, font=("Arial", 16))
-comecar_button.pack()
-
-# Adicionando perguntas e entradas no frame_2
-pergunta_6 = tk.Label(frame_2, text="Substitua o valor de y = 4 em g(y) = 2x + 2", font=("Arial", 16))
-resposta_6 = tk.Entry(frame_2, font=("Arial", 14))
-verificar_button_6 = tk.Button(frame_2, text="Verificar", command=calcular, font=("Arial", 14))
-
-pergunta_6b = tk.Label(frame_2, text="Isole x na equação resultante", font=("Arial", 16))
-resposta_6b = tk.Entry(frame_2, font=("Arial", 14))
-verificar_button_6b = tk.Button(frame_2, text="Verificar", command=calcular, font=("Arial", 14))
-
-pergunta_6c = tk.Label(frame_2, text="Resolva para x", font=("Arial", 16))
-resposta_6c = tk.Entry(frame_2, font=("Arial", 14))
-verificar_button_6c = tk.Button(frame_2, text="Verificar", command=calcular, font=("Arial", 14))
-
-pergunta_1 = tk.Label(frame_2, text="Pergunta 1: Qual é a resposta?", font=("Arial", 16))
-resposta_1 = tk.Entry(frame_2, font=("Arial", 14))
-verificar_button_1 = tk.Button(frame_2, text="Verificar", command=calcular, font=("Arial", 14))
-
-pergunta_2 = tk.Label(frame_2, text="Pergunta 2: Qual é a resposta?", font=("Arial", 16))
-resposta_2 = tk.Entry(frame_2, font=("Arial", 14))
-verificar_button_2 = tk.Button(frame_2, text="Verificar", command=calcular, font=("Arial", 14))
-
-pergunta_3 = tk.Label(frame_2, text="Pergunta 3: Qual é a resposta?", font=("Arial", 16))
-resposta_3 = tk.Entry(frame_2, font=("Arial", 14))
-verificar_button_3 = tk.Button(frame_2, text="Verificar", command=calcular, font=("Arial", 14))
-
-pergunta_4 = tk.Label(frame_2, text="Pergunta 4: Qual é a resposta?", font=("Arial", 16))
-resposta_4 = tk.Entry(frame_2, font=("Arial", 14))
-verificar_button_4 = tk.Button(frame_2, text="Verificar", command=calcular, font=("Arial", 14))
-
-# Inicializando a etapa
-etapa = 0
-
-# Iniciar o loop principal
-root.mainloop()
-
-
+ft.app(target=main)
