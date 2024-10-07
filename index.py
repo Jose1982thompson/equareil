@@ -158,12 +158,17 @@ def mudar_pagina(page, pagina):
 
 # Função principal do app
 def main(page):
-    global pergunta_6, pergunta_6b, pergunta_6c, resposta_5, resposta_6, resposta_6b, resposta_6c
+    global pergunta_6, pergunta_6b, pergunta_6c, resposta_1, resposta_2, resposta_3, resposta_4
+    global resposta_5, resposta_6, resposta_6b, resposta_6c
 
     page.title = "Exercícios Interativos"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
+    resposta_1 = ft.TextField(label="Resposta 1")
+    resposta_2 = ft.TextField(label="Resposta 2")
+    resposta_3 = ft.TextField(label="Resposta 3")
+    resposta_4 = ft.TextField(label="Resposta 4")
     resposta_5 = ft.TextField(label="Resposta 5")
     resposta_6 = ft.TextField(label="Resposta 6")
     resposta_6b = ft.TextField(label="Resposta 6b")
@@ -184,6 +189,10 @@ def main(page):
                 resposta_6b,
                 pergunta_6c,
                 resposta_6c,
+                resposta_1,
+                resposta_2,
+                resposta_3,
+                resposta_4,
             ]
         )
     )
