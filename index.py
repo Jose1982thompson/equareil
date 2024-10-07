@@ -22,7 +22,6 @@ def calcular(resposta_usuario, resposta_correta, mensagem_sucesso, dica):
         return f"Sua resposta não está correta. Dica: {dica}\nAcertos: {acertos}, Erros: {erros}"
 
 def on_start_click(e):
-    # Altera a visibilidade das páginas
     welcome_page.visible = False
     question_page.visible = True
     page.update()
@@ -55,10 +54,17 @@ question_page = ft.Column([
 ])
 
 # Configuração inicial da página
-page = ft.Page()
-page.add(welcome_page, question_page)
+page = ft.Page(
+    title="Tutor de Matemática",
+    content=ft.Column([
+        welcome_page,
+        question_page,
+    ])
+)
+
+# Iniciar o app
 welcome_page.visible = True
 question_page.visible = False
 
-# Iniciar o app
 page.run()
+
