@@ -8,11 +8,11 @@ acertos = 0
 erros = 0
 
 # Respostas esperadas (defina as suas respostas corretas)
-resp_esp1 = ["resposta correta 1"]  # Adicione as respostas corretas
-resp_esp2 = ["resposta correta 2"]  # Adicione as respostas corretas
-resp_esp3 = ["resposta correta 3"]  # Adicione as respostas corretas
-resp_esp4 = ["resposta correta 4"]  # Adicione as respostas corretas
-resp_esp5 = ["resposta correta 5"]  # Adicione as respostas corretas
+resp_esp1 = ["1", "um", "1,0", "1.0"]
+resp_esp2 = ["4", "quatro", "4,0", "4.0"]
+resp_esp3 = ["6", "seis", "6,0", "6.0"]
+resp_esp4 = ["7", "sete", "7,0", "7.0"]
+resp_esp5 = ["10", "dez", "10,0", "10.0"]
 
 # Função para mostrar aviso
 def mostrar_aviso(mensagem, dica=""):
@@ -42,7 +42,7 @@ def calcular(e):
     resposta_usuario = e.control.value.strip().lower()
     
     if etapa == 1:
-        if resposta_usuario in [resp.lower() for resp in resp_esp5]:
+        if resposta_usuario in [resp.lower() for resp in resp_esp1]:
             acertos += 1
             etapa += 1
             av.view.add(mostrar_sucesso("Você acertou a primeira etapa!"))
@@ -50,7 +50,46 @@ def calcular(e):
             erros += 1
             av.view.add(mostrar_aviso("Sua resposta não está correta, tente novamente.",
                                        "Dica: reescreva a equação substituindo o valor de x e efetue as operações."))
-    # Adicione as outras etapas da mesma forma...
+
+    elif etapa == 2:
+        if resposta_usuario in [resp.lower() for resp in resp_esp2]:
+            acertos += 1
+            etapa += 1
+            av.view.add(mostrar_sucesso("Você acertou a segunda etapa!"))
+        else:
+            erros += 1
+            av.view.add(mostrar_aviso("Sua resposta não está correta, tente novamente.",
+                                       "Dica: reescreva a equação substituindo o valor de x e efetue as operações."))
+
+    elif etapa == 3:
+        if resposta_usuario in [resp.lower() for resp in resp_esp3]:
+            acertos += 1
+            etapa += 1
+            av.view.add(mostrar_sucesso("Você acertou a terceira etapa!"))
+        else:
+            erros += 1
+            av.view.add(mostrar_aviso("Sua resposta não está correta, tente novamente.",
+                                       "Dica: reescreva a equação substituindo o valor de x e efetue as operações."))
+
+    elif etapa == 4:
+        if resposta_usuario in [resp.lower() for resp in resp_esp4]:
+            acertos += 1
+            etapa += 1
+            av.view.add(mostrar_sucesso("Você acertou a quarta etapa!"))
+        else:
+            erros += 1
+            av.view.add(mostrar_aviso("Sua resposta não está correta, tente novamente.",
+                                       "Dica: reescreva a equação substituindo o valor de x e efetue as operações."))
+
+    elif etapa == 5:
+        if resposta_usuario in [resp.lower() for resp in resp_esp5]:
+            acertos += 1
+            av.view.add(mostrar_sucesso("Você acertou a quinta etapa!"))
+            mostrar_grafico()
+        else:
+            erros += 1
+            av.view.add(mostrar_aviso("Sua resposta não está correta, tente novamente.",
+                                       "Dica: reescreva a equação substituindo o valor de x e efetue as operações."))
 
     # Exiba a próxima pergunta
     mostrar_proxima_pergunta()
@@ -58,7 +97,10 @@ def calcular(e):
 # Função para mostrar perguntas subsequentes
 def mostrar_proxima_pergunta():
     av.view.remove_all()
-    av.view.add(ft.Column([perguntas[etapa - 1]]))  # Adicione perguntas em uma lista
+    if etapa <= 5:
+        av.view.add(perguntas[etapa - 1])  # Adiciona a próxima pergunta
+    else:
+        av.view.add(ft.Text("Parabéns! Você completou todas as etapas.", size=24))
 
 # Função para criar o gráfico
 def mostrar_grafico():
@@ -78,9 +120,11 @@ def main(page):
     # Estruturas para perguntas e respostas
     global perguntas
     perguntas = [
-        ft.Column([ft.Text("Pergunta 1"), ft.TextField(on_submit=calcular)]),
-        ft.Column([ft.Text("Pergunta 2"), ft.TextField(on_submit=calcular)]),
-        # Adicione as perguntas restantes...
+        ft.Column([ft.Text("Pergunta 1: Qual o resultado de 2 + 2?"), ft.TextField(on_submit=calcular)]),
+        ft.Column([ft.Text("Pergunta 2: Qual o resultado de 2 x 2?"), ft.TextField(on_submit=calcular)]),
+        ft.Column([ft.Text("Pergunta 3: Qual o resultado de 8 / 4?"), ft.TextField(on_submit=calcular)]),
+        ft.Column([ft.Text("Pergunta 4: Qual o resultado de 14 - 7?"), ft.TextField(on_submit=calcular)]),
+        ft.Column([ft.Text("Pergunta 5: Qual o resultado de 2 ^ 3?"), ft.TextField(on_submit=calcular)]),
     ]
     
     # Adiciona a primeira pergunta ao layout
@@ -88,4 +132,3 @@ def main(page):
 
 # Inicia a aplicação
 ft.app(target=main)
-
