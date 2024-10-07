@@ -89,7 +89,6 @@ def calcular(page):
             mostrar_sucesso(page, "Você acertou a quarta etapa!")
             acertos += 1
             etapa += 1
-            mudar_pagina(page, 3)
             mostrar_proxima_pergunta(page)
         else:
             mostrar_aviso(page, "Sua resposta não está correta, tente novamente.",
@@ -141,15 +140,19 @@ def calcular(page):
 # Função para mostrar as próximas perguntas
 def mostrar_proxima_pergunta(page):
     global etapa
+    # Ocultar todas as perguntas
+    pergunta_6.visible = False
+    pergunta_6b.visible = False
+    pergunta_6c.visible = False
+
     if etapa == 2:
         pergunta_6.visible = True
-        page.update()
     elif etapa == 3:
         pergunta_6b.visible = True
-        page.update()
     elif etapa == 4:
         pergunta_6c.visible = True
-        page.update()
+
+    page.update()  # Atualizar a página para refletir as mudanças
 
 # Função para mudar de página
 def mudar_pagina(page, pagina):
