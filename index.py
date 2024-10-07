@@ -6,10 +6,11 @@ erros = 0
 acertos = 0
 
 # Respostas esperadas
-resp_esp1 = ["3x+24=-x+4", "3x+24=4-x", "-x+4=3x+24"]
-resp_esp2 = ["4x=-20", "-20=4x", "3x+x=4-24"]
-resp_esp3 = ["x=-5"]
-resp_esp4 = ["y=9"]
+resp_esp1 = ["7", x=7"]
+resp_esp2 = ["3x+24=-x+4", "3x+24=4-x", "-x+4=3x+24"]
+resp_esp3 = ["4x=-20", "-20=4x", "3x+x=4-24"]
+resp_esp4 = ["x=-5"]
+resp_esp5 = ["y=9"]
 
 # Função para verificar respostas
 def verificar_resposta(resposta, resp_esperada):
