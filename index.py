@@ -45,6 +45,33 @@ def main(page: ft.Page):
                 resposta_7.visible = True
             else:
                 page.add(ft.Text("Sua resposta não está correta. Tente novamente."))
+       
+        elif etapa == 3:
+            if verificar_resposta(resposta_6.value.strip().lower(), resp_esp2):
+                page.add(ft.Text("Você acertou a segunda etapa!"))
+                etapa += 1
+                pergunta_7.visible = True
+                resposta_7.visible = True
+            else:
+                page.add(ft.Text("Sua resposta não está correta. Tente novamente."))
+
+        elif etapa == 4:
+            if verificar_resposta(resposta_6.value.strip().lower(), resp_esp2):
+                page.add(ft.Text("Você acertou a segunda etapa!"))
+                etapa += 1
+                pergunta_7.visible = True
+                resposta_7.visible = True
+            else:
+                page.add(ft.Text("Sua resposta não está correta. Tente novamente."))
+
+        elif etapa == 5:
+            if verificar_resposta(resposta_6.value.strip().lower(), resp_esp2):
+                page.add(ft.Text("Você acertou a segunda etapa!"))
+                etapa += 1
+                pergunta_7.visible = True
+                resposta_7.visible = True
+            else:
+                page.add(ft.Text("Sua resposta não está correta. Tente novamente."))
 
         # Continue para as próximas etapas
 
