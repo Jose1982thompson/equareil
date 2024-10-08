@@ -272,7 +272,7 @@ def main(page: ft.Page):
 
     # Pergunta 6
 
-    pergunta_6 = ft.Text("6) Agora, sabendo que x = -5, encontre o valor de y. Insira o valor final de y.", visible=False)
+    pergunta_6 = ft.Text("6) Agora, sabendo que x = -5, encontre o valor de y em y = 2x + 3. Insira o valor final de y.", visible=False)
 
     resposta_6 = ft.TextField(label="Sua resposta", visible=False)
 
